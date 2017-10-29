@@ -1,12 +1,12 @@
 # user-authentication-using-voice-biometrics
 Project involving Voice Signal Processing of users to recognise them using Voice Biometrics
 
-scikit-learn
-scikits.talkbox
-pyssp
-PyQt4
-PyAudio
-Python bindings for bob
+1. scikit-learn
+2. scikits.talkbox
+3. pyssp
+4. PyQt4
+5. PyAudio
+6. Python bindings for bob
 	
 In order to use `fast-gmm` instead of `sklearn.mixture.GaussianMixture` :
   run `make -C gmm/` in terminal to configure your system for fast-gmm
