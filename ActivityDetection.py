@@ -6,23 +6,38 @@ class ActivityDetection:
 
     def __init__(self):
         self.initted = False
+        #self.nr = NoiseReduction()
         self.ltsd = LTSD_VAD()
+        self.vad = VoiceActivityDetector()
 
     def init_noise(self, fs, signal):
         self.initted = True
+        #self.nr.init_noise(fs, signal)
         self.ltsd.init_params_by_noise(fs, signal)
+        #nred = self.nr.filter(fs, signal)
+        #self.ltsd.init_params_by_noise(fs, nred)
 
     def filter(self, fs, signal):
         if not self.initted:
             raise "NoiseFilter Not Initialized"
+#        nred = self.nr.filter(fs, signal)
+#        removed = remove_silence(fs, nred)
 #        self.ltsd.plot_ltsd(fs, nred)
         orig_len = len(signal)
         filtered, intervals = self.ltsd.filter(signal)
-
+        #print 'signal lengths', len(filtered), orig_len
         if len(filtered) > orig_len / 3:
             return filtered
         return np.array([])
-
+    '''
+    def newfilter(self, fs, data):
+        speech = self.vad.detect_speech(fs, data)
+        filtered = []
+        for [start, end] in speech:
+            filtered.extend(data[start:end])
+        filtered = np.array(filtered)
+        return filtered
+    '''
     def remove_silence(self,fs, signal, frame_duration = 0.02, frame_shift = 0.01, perc = 0.15):
         orig_dtype = type(signal[0])
         siglen = len(signal)

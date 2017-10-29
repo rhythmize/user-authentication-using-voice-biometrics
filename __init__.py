@@ -3,9 +3,16 @@ import glob
 import argparse
 from RecordAudio import RecordAudio
 from ActivityDetection import ActivityDetection
+from UI import UI
 import scipy.io.wavfile as wavfile
+import traceback as tb
+import numpy as np
+from gmmset import GMM
 
+from PyQt4.QtGui import *
 from Main import Main
+
+
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -13,16 +20,14 @@ def get_args():
     parser.add_argument('-t', '--task',
                        help='Task to do. Either "enroll" or "predict"',
                        required=True)
-
     ret = parser.parse_args()
     return ret
 
 def enroll():
     try :
-        m = Main.load('02-09-2017.model')
+        m = Main.load('test.gmm')
     except :
         m = Main()
-    
     #ra=RecordAudio()
     #fs, data = ra.start_record(10.0)
     '''
@@ -48,24 +53,27 @@ def enroll():
         #print 'signal length after silence remove', len(m.signal)
         if len(m.signal) > 50:
            features = m.getFeatures()
+           #np.savetxt('data/mfcc-lpc-data/'+m.name+'.mfcc-lpc', features)
         else:
            print name,"signal is silent"
     print "features saved"
-    
+
+	# train UBM Model prior to GMM Model    
+	#m.train_ubm()
     m.train()
     m.dump()
 
 def predict():
     try :
-        m = Main.load('02-09-2017.model')
-    except :
-        print "Trained Model not found."
+        m = Main.load('test.gmm')
+    except Exception as e:
+        print tb.format_exc()
         exit()
-    
     #ra=RecordAudio()
     #fs, data = ra.start_record(10.0)
-    '''
+    
     audios = glob.glob('audio test samples/*.wav')
+    
     if len(audios) is 0:
         print "No audio file found"
         exit()
@@ -76,9 +84,12 @@ def predict():
         m.signal = m.ad.filter(fs, data)
         #print 'signal length after silence remove', len(m.signal)
         name = audio.split('/')[-1].split('.')[0]
-        #print len(m.signal)
+        
         if len(m.signal) > 50:
-            user = m.predict()
+            try :
+                user = m.predict()
+            except Exception as e :
+                print tb.format_exc()
         print name, '-->', user
     
     '''
@@ -91,9 +102,15 @@ def predict():
     if len(m.signal) > 50:
         user = m.predict()
     print "Current speaker is identified as ", user
-    
+    '''
 
 if __name__ == '__main__':
+    '''
+    app = QApplication(sys.argv)
+    ui=UI()
+    ui.show()
+    sys.exit(app.exec_())
+    '''
     global ra
     args = get_args()
     task = args.task

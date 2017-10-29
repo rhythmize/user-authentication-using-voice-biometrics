@@ -34,7 +34,7 @@ class GMMSet(object):
             Xtmp[label].extend(x)
         yp, Xp = zip(*Xtmp.iteritems())
         return Xp, yp
-
+    '''
     def auto_tune_parameter(self, X, y):
         if self.ubm is None:
             return
@@ -46,6 +46,7 @@ class GMMSet(object):
             self.fit_new(x, y[ind])
 
         self.auto_tune_parameter(X, y)
+    '''
 
     def gmm_score(self, gmm, x):
         return np.sum(gmm.score(x))
@@ -63,14 +64,19 @@ class GMMSet(object):
     def predict_one_with_rejection(self, x):
         assert self.ubm is not None, \
             "UBM must be given prior to conduct reject prediction."
+        
         scores = self.predict_one_scores(x)
         x_len = len(x) # normalize score
+        
         scores = map(lambda v: v / x_len, scores)
         max_tup = max(enumerate(scores), key=operator.itemgetter(1))
+        
         ubm_score = self.gmm_score(self.ubm, x) / x_len
-        #print scores, ubm_score
+        print scores
+        #print ubm_score
         if max_tup[1] - ubm_score < self.reject_threshold:
             #print max_tup[1], ubm_score, max_tup[1] - ubm_score
+            print self.y[max_tup[0]], max_tup, ubm_score, max_tup[1] - ubm_score
             return None
         return self.y[max_tup[0]]
 
