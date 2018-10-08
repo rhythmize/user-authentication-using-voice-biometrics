@@ -1,6 +1,5 @@
 from ltsd import LTSD_VAD
 import numpy as np
-from newvad import VoiceActivityDetector
 
 class ActivityDetection:
 
@@ -8,7 +7,6 @@ class ActivityDetection:
         self.initted = False
         #self.nr = NoiseReduction()
         self.ltsd = LTSD_VAD()
-        self.vad = VoiceActivityDetector()
 
     def init_noise(self, fs, signal):
         self.initted = True
@@ -29,15 +27,7 @@ class ActivityDetection:
         if len(filtered) > orig_len / 3:
             return filtered
         return np.array([])
-    '''
-    def newfilter(self, fs, data):
-        speech = self.vad.detect_speech(fs, data)
-        filtered = []
-        for [start, end] in speech:
-            filtered.extend(data[start:end])
-        filtered = np.array(filtered)
-        return filtered
-    '''
+    
     def remove_silence(self,fs, signal, frame_duration = 0.02, frame_shift = 0.01, perc = 0.15):
         orig_dtype = type(signal[0])
         siglen = len(signal)
